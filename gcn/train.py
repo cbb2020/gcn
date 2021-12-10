@@ -32,6 +32,9 @@ flags.DEFINE_integer('max_degree', 3, 'Maximum Chebyshev polynomial degree.')
 # train_mask, val_mask, test_mask: (2708,)
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data(FLAGS.dataset)
 
+# print('features.shape: ', features.shape)
+# print('features.type: ', type(features))
+
 # Some preprocessing
 # Normalize the feature matrix and return the tuple: (coords, values, shape)
 features = preprocess_features(features)

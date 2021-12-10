@@ -67,13 +67,15 @@ def load_data(dataset_str):
         ty_extended[test_idx_range-min(test_idx_range), :] = ty
         ty = ty_extended
 
+    # The original code for processing the feature matrix
     features = sp.vstack((allx, tx)).tolil()
-    # print('features.type: ', type(features))
-    # print('features: ', features[0, 19])
-    # print('features.shape: ', features.shape)
-
     features[test_idx_reorder, :] = features[test_idx_range, :]
-    # print('features.shape: ', features.shape)
+
+    # Generate one-hot embedding as features of node
+    feats_shape = features.shape
+    one_hot_array = np.eye(feats_shape[0])
+    features = sp.lil_matrix(one_hot_array, shape=feats_shape)
+
     adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
     # print('adj.shape: ', adj.shape)
 
