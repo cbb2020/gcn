@@ -1,5 +1,5 @@
-from gcn.layers import *
-from gcn.metrics import *
+from layers import *
+from metrics import *
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -22,6 +22,7 @@ class Model(object):
         self.placeholders = {}
 
         self.layers = []
+        # Save every input and output of the last layer
         self.activations = []
 
         self.inputs = None
@@ -164,6 +165,7 @@ class GCN(Model):
                                             act=tf.nn.relu,
                                             dropout=True,
                                             sparse_inputs=True,
+                                            # featureless=True,
                                             logging=self.logging))
 
         self.layers.append(GraphConvolution(input_dim=FLAGS.hidden1,
@@ -171,6 +173,7 @@ class GCN(Model):
                                             placeholders=self.placeholders,
                                             act=lambda x: x,
                                             dropout=True,
+                                            # featureless=True,
                                             logging=self.logging))
 
     def predict(self):

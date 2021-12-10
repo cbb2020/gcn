@@ -25,13 +25,13 @@ def load_data(dataset_str):
     """
     Loads input data from gcn/data directory
 
-    ind.dataset_str.x => the feature vectors of the training instances as scipy.sparse.csr.csr_matrix object;
-    ind.dataset_str.tx => the feature vectors of the test instances as scipy.sparse.csr.csr_matrix object;
-    ind.dataset_str.allx => the feature vectors of both labeled and unlabeled training instances
+    ind.dataset_str.x => the feature vectors of the training instances as scipy.sparse.csr.csr_matrix object;   (140, 1433)
+    ind.dataset_str.tx => the feature vectors of the test instances as scipy.sparse.csr.csr_matrix object;  (1000, 1433)
+    ind.dataset_str.allx => the feature vectors of both labeled and unlabeled training instances            (1708, 1433)
         (a superset of ind.dataset_str.x) as scipy.sparse.csr.csr_matrix object;
-    ind.dataset_str.y => the one-hot labels of the labeled training instances as numpy.ndarray object;
-    ind.dataset_str.ty => the one-hot labels of the test instances as numpy.ndarray object;
-    ind.dataset_str.ally => the labels for instances in ind.dataset_str.allx as numpy.ndarray object;
+    ind.dataset_str.y => the one-hot labels of the labeled training instances as numpy.ndarray object;      (140, 1433)
+    ind.dataset_str.ty => the one-hot labels of the test instances as numpy.ndarray object;                 (1000, 1433)
+    ind.dataset_str.ally => the labels for instances in ind.dataset_str.allx as numpy.ndarray object;       (1708, 1433)
     ind.dataset_str.graph => a dict in the format {index: [index_of_neighbor_nodes]} as collections.defaultdict
         object;
     ind.dataset_str.test.index => the indices of test instances in graph, for the inductive setting as list object.
@@ -51,7 +51,9 @@ def load_data(dataset_str):
                 objects.append(pkl.load(f))
 
     x, y, tx, ty, allx, ally, graph = tuple(objects)
+    # test_idx_reorder's shape: (1000,)
     test_idx_reorder = parse_index_file("data/ind.{}.test.index".format(dataset_str))
+    # test_idx_range: from 1708 to 2707, len: 1000
     test_idx_range = np.sort(test_idx_reorder)
 
     if dataset_str == 'citeseer':
@@ -66,14 +68,23 @@ def load_data(dataset_str):
         ty = ty_extended
 
     features = sp.vstack((allx, tx)).tolil()
+    # print('features.type: ', type(features))
+    # print('features: ', features[0, 19])
+    # print('features.shape: ', features.shape)
+
     features[test_idx_reorder, :] = features[test_idx_range, :]
+    # print('features.shape: ', features.shape)
     adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
+    # print('adj.shape: ', adj.shape)
 
     labels = np.vstack((ally, ty))
     labels[test_idx_reorder, :] = labels[test_idx_range, :]
 
+    # 1000, from 1708 to 2707
     idx_test = test_idx_range.tolist()
+    # 140, from 0 to 139
     idx_train = range(len(y))
+    # 500, from 140 to 639
     idx_val = range(len(y), len(y)+500)
 
     train_mask = sample_mask(idx_train, labels.shape[0])
@@ -113,9 +124,16 @@ def preprocess_features(features):
     """Row-normalize feature matrix and convert to tuple representation"""
     rowsum = np.array(features.sum(1))
     r_inv = np.power(rowsum, -1).flatten()
+    # print('r_inv: ', r_inv)
+    # print('r_inv_n: ', len(r_inv))
     r_inv[np.isinf(r_inv)] = 0.
+    # print(r_inv.shape)
+    # print(r_inv[:10])
     r_mat_inv = sp.diags(r_inv)
     features = r_mat_inv.dot(features)
+    print(features[:10])
+    # ft = sparse_to_tuple(features)
+    # print(ft[:10])
     return sparse_to_tuple(features)
 
 

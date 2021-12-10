@@ -1,4 +1,4 @@
-from gcn.inits import *
+from inits import *
 import tensorflow as tf
 
 flags = tf.app.flags
@@ -142,6 +142,7 @@ class GraphConvolution(Layer):
             self.dropout = 0.
 
         self.act = act
+        # list, [tf.sparse_placeholder(tf.float32)], len:1
         self.support = placeholders['support']
         self.sparse_inputs = sparse_inputs
         self.featureless = featureless
@@ -162,7 +163,6 @@ class GraphConvolution(Layer):
 
     def _call(self, inputs):
         x = inputs
-
         # dropout
         if self.sparse_inputs:
             x = sparse_dropout(x, 1-self.dropout, self.num_features_nonzero)

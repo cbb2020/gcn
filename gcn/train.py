@@ -1,11 +1,12 @@
-from __future__ import division
-from __future__ import print_function
+# from __future__ import division
+# from __future__ import print_function
 
+import sys
 import time
 import tensorflow as tf
 
-from gcn.utils import *
-from gcn.models import GCN, MLP
+from utils import *
+from models import GCN, MLP
 
 # Set random seed
 seed = 123
@@ -26,11 +27,17 @@ flags.DEFINE_integer('early_stopping', 10, 'Tolerance for early stopping (# of e
 flags.DEFINE_integer('max_degree', 3, 'Maximum Chebyshev polynomial degree.')
 
 # Load data
+# adj:(2708, 2708), features:(2708, 1433)
+# y_train, y_val, y_test: (2708, 7)
+# train_mask, val_mask, test_mask: (2708,)
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data(FLAGS.dataset)
 
 # Some preprocessing
+# Normalize the feature matrix and return the tuple: (coords, values, shape)
 features = preprocess_features(features)
+
 if FLAGS.model == 'gcn':
+    # Normalized form of adjacency matrix
     support = [preprocess_adj(adj)]
     num_supports = 1
     model_func = GCN
@@ -54,6 +61,8 @@ placeholders = {
     'dropout': tf.placeholder_with_default(0., shape=()),
     'num_features_nonzero': tf.placeholder(tf.int32)  # helper variable for sparse dropout
 }
+
+# print('num_supports:', num_supports)
 
 # Create model
 model = model_func(placeholders, input_dim=features[2][1], logging=True)
