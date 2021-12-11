@@ -163,6 +163,7 @@ class GraphConvolution(Layer):
 
     def _call(self, inputs):
         x = inputs
+
         # dropout
         if self.sparse_inputs:
             x = sparse_dropout(x, 1-self.dropout, self.num_features_nonzero)

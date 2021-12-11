@@ -72,9 +72,9 @@ def load_data(dataset_str):
     features[test_idx_reorder, :] = features[test_idx_range, :]
 
     # Generate one-hot embedding as features of node
-    feats_shape = features.shape
-    one_hot_array = np.eye(feats_shape[0])
-    features = sp.lil_matrix(one_hot_array, shape=feats_shape)
+    # feats_shape = features.shape
+    # one_hot_array = np.eye(feats_shape[0])
+    # features = sp.lil_matrix(one_hot_array, shape=feats_shape)
 
     adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
     # print('adj.shape: ', adj.shape)
